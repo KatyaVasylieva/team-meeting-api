@@ -50,3 +50,17 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TypeOfMeeting(models.Model):
+    NAME_CHOICES = (
+        ("WEEKLY", "Weekly meeting"),
+        ("URGENT", "Urgent meeting"),
+        ("CLIENT", "Meeting with client"),
+        ("CELEBRATION", "Celebration"),
+    )
+
+    name = models.CharField(max_length=11, choices=NAME_CHOICES, default="WEEKLY")
+
+    def __str__(self):
+        return self.name
