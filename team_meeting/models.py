@@ -26,3 +26,15 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Team(models.Model):
+    name = models.CharField(max_length=63)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    num_of_members = models.IntegerField()
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
