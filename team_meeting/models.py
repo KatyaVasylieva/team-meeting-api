@@ -8,7 +8,9 @@ from django.utils.text import slugify
 
 class MeetingRoom(models.Model):
     name = models.CharField(max_length=63)
-    capacity = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(100)])
+    capacity = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(100)]
+    )
     has_projector = models.BooleanField(default=False)
     is_soundproof = models.BooleanField(default=False)
 
@@ -16,9 +18,12 @@ class MeetingRoom(models.Model):
         ordering = ["capacity"]
 
     def __str__(self):
-        return f"{self.name} ({self.capacity} {'person' if self.capacity==1 else 'people'}" \
-               f"{', projector' if self.has_projector else ''}" \
-               f"{', soundproof' if self.is_soundproof else ''})"
+        return (
+            f"{self.name} ({self.capacity} "
+            f"{'person' if self.capacity==1 else 'people'}"
+            f"{', projector' if self.has_projector else ''}"
+            f"{', soundproof' if self.is_soundproof else ''})"
+        )
 
 
 def project_image_file_path(instance, filename):
@@ -42,7 +47,11 @@ class Project(models.Model):
 
 class Team(models.Model):
     name = models.CharField(max_length=63)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="teams"
+    )
     num_of_members = models.IntegerField()
 
     class Meta:
@@ -61,7 +70,19 @@ class TypeOfMeeting(models.Model):
         ("CELEBRATION", "Celebration"),
     )
 
-    name = models.CharField(max_length=11, choices=NAME_CHOICES, default="WEEKLY")
+    name = models.CharField(
+        max_length=11,
+        choices=NAME_CHOICES,
+        default="WEEKLY"
+    )
 
     def __str__(self):
         return self.name
+
+
+class Meeting(models.Model):
+    teams = models.ManyToManyField(Team, related_name="meetings")
+    type_of_meeting = models.ForeignKey(
+        TypeOfMeeting, on_delete=models.PROTECT, related_name="meetings"
+    )
+    requires_meeting_room = models.BooleanField(default=False)
