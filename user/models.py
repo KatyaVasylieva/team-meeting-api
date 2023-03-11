@@ -5,6 +5,8 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.utils.translation import gettext as _
 
+from team_meeting.models import Team
+
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
@@ -38,6 +40,13 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
+    team = models.ForeignKey(
+        Team,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="users"
+    )
     username = None
     email = models.EmailField(_("email address"), unique=True)
 
