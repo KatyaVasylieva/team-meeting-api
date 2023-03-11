@@ -15,3 +15,14 @@ class MeetingRoom(models.Model):
         return f"{self.name} ({self.capacity} {'person' if self.capacity==1 else 'people'}" \
                f"{', projector' if self.has_projector else ''}" \
                f"{', soundproof' if self.is_soundproof else ''})"
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=63)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
