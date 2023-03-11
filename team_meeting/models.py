@@ -31,7 +31,7 @@ class MeetingRoom(models.Model):
 
 def project_image_file_path(instance, filename):
     _, extension = os.path.splitext(filename)
-    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+    filename = f"{slugify(instance.name)}-{uuid.uuid4()}{extension}"
 
     return os.path.join("uploads/projects/", filename)
 
@@ -110,24 +110,25 @@ class Booking(models.Model):
         ordering = ["room", "-start_hour"]
 
     @staticmethod
-    def validate_time(day, start_hour, end_hour, room, error_to_raise):
+    def validate_time(id, day, start_hour, end_hour, room, error_to_raise):
         bookings_start_in_range = Booking.objects.filter(
             day=day, room=room, start_hour__range=(start_hour, end_hour - 1)
-        )
+        ).exclude(id=id)
         bookings_end_in_range = Booking.objects.filter(
             day=day, room=room, end_hour__range=(start_hour + 1, end_hour)
-        )
+        ).exclude(id=id)
         if bookings_start_in_range:
             raise error_to_raise(
-                "Your meeting start time conflicts with another meeting"
+                "Your meeting end time conflicts with another meeting"
             )
         if bookings_end_in_range:
             raise error_to_raise(
-                "Your meeting end time conflicts with another meeting"
+                "Your meeting start time conflicts with another meeting"
             )
 
     def clean(self):
         Booking.validate_time(
+            self.id,
             self.day,
             self.start_hour,
             self.end_hour,
@@ -149,6 +150,6 @@ class Booking(models.Model):
 
     def __str__(self):
         return (
-            f"{self.meeting} ({self.room} meeting room, "
-            f"{self.day} {self.start_hour}-{self.end_hour})"
+            f"{self.meeting} ({self.room.name} meeting room, "
+            f"{self.day} {self.start_hour}:00-{self.end_hour}:00)"
         )
