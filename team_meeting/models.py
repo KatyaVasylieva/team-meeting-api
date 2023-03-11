@@ -107,7 +107,7 @@ class Booking(models.Model):
     )
 
     class Meta:
-        ordering = ["-start_time"]
+        ordering = ["room", "-start_hour"]
 
     @staticmethod
     def validate_time(day, start_hour, end_hour, room, error_to_raise):
