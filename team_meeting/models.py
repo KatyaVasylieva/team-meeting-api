@@ -1,5 +1,9 @@
+import os
+import uuid
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils.text import slugify
 
 
 class MeetingRoom(models.Model):
@@ -17,9 +21,17 @@ class MeetingRoom(models.Model):
                f"{', soundproof' if self.is_soundproof else ''})"
 
 
+def project_image_file_path(instance, filename):
+    _, extension = os.path.splitext(filename)
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+
+    return os.path.join("uploads/projects/", filename)
+
+
 class Project(models.Model):
     name = models.CharField(max_length=63)
     description = models.TextField(blank=True)
+    image = models.ImageField(null=True, upload_to=project_image_file_path)
 
     class Meta:
         ordering = ["name"]
