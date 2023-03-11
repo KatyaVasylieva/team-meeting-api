@@ -54,6 +54,7 @@ class Team(models.Model):
 
 class TypeOfMeeting(models.Model):
     NAME_CHOICES = (
+        ("DAILY", "Daily meeting"),
         ("WEEKLY", "Weekly meeting"),
         ("URGENT", "Urgent meeting"),
         ("CLIENT", "Meeting with client"),
