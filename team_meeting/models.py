@@ -4,6 +4,9 @@ import uuid
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.text import slugify
+from rest_framework.exceptions import ValidationError
+
+from team_meeting_service import settings
 
 
 class MeetingRoom(models.Model):
@@ -48,9 +51,7 @@ class Project(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=63)
     project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-        related_name="teams"
+        Project, on_delete=models.CASCADE, related_name="teams"
     )
     num_of_members = models.IntegerField()
 
@@ -71,9 +72,7 @@ class TypeOfMeeting(models.Model):
     )
 
     name = models.CharField(
-        max_length=11,
-        choices=NAME_CHOICES,
-        default="WEEKLY"
+        max_length=11, choices=NAME_CHOICES, default="WEEKLY"
     )
 
     def __str__(self):
@@ -81,8 +80,75 @@ class TypeOfMeeting(models.Model):
 
 
 class Meeting(models.Model):
-    teams = models.ManyToManyField(Team, related_name="meetings")
+    team = models.ForeignKey(
+        Team, on_delete=models.CASCADE, related_name="meetings"
+    )
     type_of_meeting = models.ForeignKey(
         TypeOfMeeting, on_delete=models.PROTECT, related_name="meetings"
     )
     requires_meeting_room = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.type_of_meeting} of {self.team}"
+
+
+class Booking(models.Model):
+    room = models.ForeignKey(
+        MeetingRoom, on_delete=models.CASCADE, related_name="bookings"
+    )
+    day = models.DateField()
+    start_hour = models.IntegerField()
+    end_hour = models.IntegerField()
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
+    meeting = models.OneToOneField(
+        Meeting, on_delete=models.CASCADE, related_name="booking"
+    )
+
+    class Meta:
+        ordering = ["-start_time"]
+
+    @staticmethod
+    def validate_time(day, start_hour, end_hour, room, error_to_raise):
+        bookings_start_in_range = Booking.objects.filter(
+            day=day, room=room, start_hour__range=(start_hour, end_hour - 1)
+        )
+        bookings_end_in_range = Booking.objects.filter(
+            day=day, room=room, end_hour__range=(start_hour + 1, end_hour)
+        )
+        if bookings_start_in_range:
+            raise error_to_raise(
+                "Your meeting start time conflicts with another meeting"
+            )
+        if bookings_end_in_range:
+            raise error_to_raise(
+                "Your meeting end time conflicts with another meeting"
+            )
+
+    def clean(self):
+        Booking.validate_time(
+            self.day,
+            self.start_hour,
+            self.end_hour,
+            self.room,
+            ValidationError,
+        )
+
+    def save(
+        self,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
+    ):
+        self.full_clean()
+        return super(Booking, self).save(
+            force_insert, force_update, using, update_fields
+        )
+
+    def __str__(self):
+        return (
+            f"{self.meeting} ({self.room} meeting room, "
+            f"{self.day} {self.start_hour}-{self.end_hour})"
+        )
