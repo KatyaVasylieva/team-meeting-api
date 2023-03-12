@@ -22,3 +22,9 @@ class ProjectRetrieveSerializer(ProjectSerializer):
     class Meta:
         model = Project
         fields = ("name", "description", "image")
+
+
+class ProjectImageSerializer(ProjectSerializer):
+    class Meta:
+        model = Project
+        fields = ("id", "image")

@@ -1,8 +1,12 @@
-from rest_framework import mixins
+from rest_framework import mixins, status
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from team_meeting.models import MeetingRoom, Project
-from team_meeting.serializers import MeetingRoomSerializer, ProjectSerializer, ProjectRetrieveSerializer
+from team_meeting.serializers import MeetingRoomSerializer, ProjectSerializer, ProjectRetrieveSerializer, \
+    ProjectImageSerializer
 
 
 class MeetingRoomViewSet(
@@ -31,4 +35,27 @@ class ProjectViewSet(
         if self.action == "retrieve":
             return ProjectRetrieveSerializer
 
+        if self.action == "create":
+            return ProjectSerializer
+
+        if self.action == "upload_image":
+            return ProjectImageSerializer
+
         return ProjectSerializer
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+        permission_classes=[IsAdminUser],
+    )
+    def upload_image(self, request, pk=None):
+        """Endpoint for uploading image to specific project"""
+        project = self.get_object()
+        serializer = self.get_serializer(project, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
