@@ -168,6 +168,25 @@ class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
 
+    def get_queryset(self):
+        day = self.request.query_params.get("day")
+        room = self.request.query_params.get("room")
+        project = self.request.query_params.get("project")
+
+        queryset = self.queryset
+
+        if day:
+            day = datetime.strptime(day, "%Y-%m-%d").date()
+            queryset = queryset.filter(day=day)
+
+        if room:
+            queryset = queryset.filter(room__name__icontains=room)
+
+        if project:
+            queryset = queryset.filter(meeting__team__project__name__icontains=project)
+
+        return queryset
+
     def get_serializer_class(self):
         if self.action == "list":
             return BookingListSerializer
