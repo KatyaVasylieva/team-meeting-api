@@ -112,7 +112,7 @@ class MeetingCreateSerializer(MeetingSerializer):
 
     class Meta:
         model = Meeting
-        fields = ("team", "type_of_meeting", "requires_meeting_room")
+        fields = ("team", "type_of_meeting")
 
 
 class MeetingRetrieveSerializer(MeetingSerializer):
@@ -167,11 +167,13 @@ class BookingRetrieveSerializer(BookingListSerializer):
 class BookingCreateSerializer(BookingSerializer):
     meeting = MeetingCreateSerializer(read_only=False)
 
+    class Meta:
+        model = Booking
+        fields = ("room", "day", "start_hour", "end_hour", "meeting")
+
     def create(self, validated_data):
-        print(validated_data)
         with transaction.atomic():
             meeting_data = validated_data.pop("meeting")
-            meeting = Meeting.objects.create(**meeting_data)
+            meeting = Meeting.objects.create(requires_meeting_room="True", **meeting_data)
             booking = Booking.objects.create(meeting=meeting, **validated_data)
-
             return booking

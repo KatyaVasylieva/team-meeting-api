@@ -126,6 +126,9 @@ class MeetingViewSet(viewsets.ModelViewSet):
 
         return MeetingListSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(requires_meeting_room="False")
+
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
@@ -142,3 +145,6 @@ class BookingViewSet(viewsets.ModelViewSet):
             return BookingCreateSerializer
 
         return BookingSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
