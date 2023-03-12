@@ -109,6 +109,10 @@ class Booking(models.Model):
     class Meta:
         ordering = ["room", "-start_hour"]
 
+    @property
+    def duration(self):
+        return f"{self.start_hour}:00 - {self.end_hour}:00"
+
     @staticmethod
     def validate_time(id, day, start_hour, end_hour, room, error_to_raise):
         bookings_start_in_range = Booking.objects.filter(
