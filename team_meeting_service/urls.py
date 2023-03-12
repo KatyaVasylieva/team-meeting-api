@@ -21,5 +21,7 @@ from team_meeting_service import settings
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/team-meeting/", include("team_meeting.urls", namespace="team-meeting")),
+    path("api/team-meeting/", include(
+        "team_meeting.urls", namespace="team-meeting"
+    )),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

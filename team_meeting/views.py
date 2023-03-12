@@ -16,8 +16,17 @@ from team_meeting.serializers import (
     ProjectRetrieveSerializer,
     ProjectImageSerializer,
     TypeOfMeetingSerializer,
-    TeamSerializer, TeamListSerializer, TeamRetrieveSerializer, MeetingSerializer, MeetingListSerializer,
-    MeetingCreateSerializer, MeetingRetrieveSerializer, BookingSerializer, BookingListSerializer
+    TeamSerializer,
+    TeamListSerializer,
+    TeamRetrieveSerializer,
+    MeetingSerializer,
+    MeetingListSerializer,
+    MeetingCreateSerializer,
+    MeetingRetrieveSerializer,
+    BookingSerializer,
+    BookingListSerializer,
+    BookingRetrieveSerializer,
+    BookingCreateSerializer
 )
 
 
@@ -126,10 +135,10 @@ class BookingViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             return BookingListSerializer
 
-        # if self.action == "retrieve":
-        #     return MeetingRetrieveSerializer
+        if self.action == "retrieve":
+            return BookingRetrieveSerializer
 
-        # if self.action == "create":
-        #     return MeetingCreateSerializer
+        if self.action == "create":
+            return BookingCreateSerializer
 
         return BookingSerializer

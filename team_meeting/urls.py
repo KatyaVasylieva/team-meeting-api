@@ -3,7 +3,11 @@ from rest_framework import routers
 
 from team_meeting.views import (
     MeetingRoomViewSet,
-    ProjectViewSet, TypeOfMeetingViewSet, TeamViewSet, MeetingViewSet, BookingViewSet,
+    ProjectViewSet,
+    TypeOfMeetingViewSet,
+    TeamViewSet,
+    MeetingViewSet,
+    BookingViewSet,
 )
 
 router = routers.DefaultRouter()

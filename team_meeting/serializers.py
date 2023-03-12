@@ -1,6 +1,14 @@
+from django.db import transaction
 from rest_framework import serializers
 
-from team_meeting.models import MeetingRoom, Project, TypeOfMeeting, Team, Meeting, Booking
+from team_meeting.models import (
+    MeetingRoom,
+    Project,
+    TypeOfMeeting,
+    Team,
+    Meeting,
+    Booking
+)
 
 
 class MeetingRoomSerializer(serializers.ModelSerializer):
@@ -91,7 +99,13 @@ class MeetingListSerializer(MeetingSerializer):
 
     class Meta:
         model = Meeting
-        fields = ("id", "team", "project", "type_of_meeting", "requires_meeting_room")
+        fields = (
+            "id",
+            "team",
+            "project",
+            "type_of_meeting",
+            "requires_meeting_room"
+        )
 
 
 class MeetingCreateSerializer(MeetingSerializer):
@@ -109,7 +123,14 @@ class MeetingRetrieveSerializer(MeetingSerializer):
 
     class Meta:
         model = Meeting
-        fields = ("id", "team_name", "team_size", "project", "type_of_meeting", "requires_meeting_room")
+        fields = (
+            "id",
+            "team_name",
+            "team_size",
+            "project",
+            "type_of_meeting",
+            "requires_meeting_room"
+        )
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -138,3 +159,21 @@ class BookingListSerializer(BookingSerializer):
     class Meta:
         model = Booking
         fields = ("id", "day", "time", "room", "user", "meeting")
+
+
+class BookingRetrieveSerializer(BookingListSerializer):
+    room = MeetingRoomSerializer()
+    meeting = MeetingListSerializer()
+
+
+class BookingCreateSerializer(BookingSerializer):
+    meeting = MeetingCreateSerializer(read_only=False)
+
+    def create(self, validated_data):
+        print(validated_data)
+        with transaction.atomic():
+            meeting_data = validated_data.pop("meeting")
+            meeting = Meeting.objects.create(**meeting_data)
+            booking = Booking.objects.create(meeting=meeting, **validated_data)
+
+            return booking
