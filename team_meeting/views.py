@@ -100,6 +100,19 @@ class TeamViewSet(
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
 
+    def get_queryset(self):
+        name = self.request.query_params.get("name")
+        project = self.request.query_params.get("project")
+        queryset = self.queryset
+
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+
+        if project:
+            queryset = queryset.filter(project__name__icontains=project)
+
+        return queryset
+
     def get_serializer_class(self):
         if self.action == "list":
             return TeamListSerializer
