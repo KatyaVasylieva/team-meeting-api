@@ -37,7 +37,7 @@ def project_image_file_path(instance, filename):
 
 
 class Project(models.Model):
-    name = models.CharField(max_length=63)
+    name = models.CharField(max_length=63, unique=True)
     description = models.TextField(blank=True)
     image = models.ImageField(null=True, upload_to=project_image_file_path)
 
@@ -72,7 +72,7 @@ class TypeOfMeeting(models.Model):
     )
 
     name = models.CharField(
-        max_length=11, choices=NAME_CHOICES, default="WEEKLY"
+        max_length=11, choices=NAME_CHOICES
     )
 
     def __str__(self):
@@ -107,7 +107,7 @@ class Booking(models.Model):
     )
 
     class Meta:
-        ordering = ["room", "-start_hour"]
+        ordering = ["day", "start_hour"]
 
     @property
     def duration(self):
