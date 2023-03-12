@@ -64,6 +64,15 @@ class ProjectViewSet(
 
         return ProjectSerializer
 
+    def get_queryset(self):
+        name = self.request.query_params.get("name")
+        queryset = self.queryset
+
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+
+        return queryset
+
     @action(
         methods=["POST"],
         detail=True,
