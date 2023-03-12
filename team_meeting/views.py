@@ -8,7 +8,7 @@ from team_meeting.models import (
     MeetingRoom,
     Project,
     TypeOfMeeting,
-    Team, Meeting
+    Team, Meeting, Booking
 )
 from team_meeting.serializers import (
     MeetingRoomSerializer,
@@ -17,7 +17,7 @@ from team_meeting.serializers import (
     ProjectImageSerializer,
     TypeOfMeetingSerializer,
     TeamSerializer, TeamListSerializer, TeamRetrieveSerializer, MeetingSerializer, MeetingListSerializer,
-    MeetingCreateSerializer, MeetingRetrieveSerializer
+    MeetingCreateSerializer, MeetingRetrieveSerializer, BookingSerializer, BookingListSerializer
 )
 
 
@@ -116,3 +116,20 @@ class MeetingViewSet(viewsets.ModelViewSet):
             return MeetingCreateSerializer
 
         return MeetingListSerializer
+
+
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return BookingListSerializer
+
+        # if self.action == "retrieve":
+        #     return MeetingRetrieveSerializer
+
+        # if self.action == "create":
+        #     return MeetingCreateSerializer
+
+        return BookingSerializer
