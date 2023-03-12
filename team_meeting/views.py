@@ -4,9 +4,9 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from team_meeting.models import MeetingRoom, Project
+from team_meeting.models import MeetingRoom, Project, TypeOfMeeting
 from team_meeting.serializers import MeetingRoomSerializer, ProjectSerializer, ProjectRetrieveSerializer, \
-    ProjectImageSerializer
+    ProjectImageSerializer, TypeOfMeetingSerializer
 
 
 class MeetingRoomViewSet(
@@ -59,3 +59,12 @@ class ProjectViewSet(
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TypeOfMeetingViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet,
+):
+    queryset = TypeOfMeeting.objects.all()
+    serializer_class = TypeOfMeetingSerializer
