@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
@@ -135,6 +137,16 @@ class TeamViewSet(
 class MeetingViewSet(viewsets.ModelViewSet):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
+
+    def get_queryset(self):
+        project = self.request.query_params.get("project")
+
+        queryset = self.queryset
+
+        if project:
+            queryset = queryset.filter(team__project__name__icontains=project)
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "list":

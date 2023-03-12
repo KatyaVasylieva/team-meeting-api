@@ -174,6 +174,8 @@ class BookingCreateSerializer(BookingSerializer):
     def create(self, validated_data):
         with transaction.atomic():
             meeting_data = validated_data.pop("meeting")
-            meeting = Meeting.objects.create(requires_meeting_room="True", **meeting_data)
+            meeting = Meeting.objects.create(
+                requires_meeting_room="True", **meeting_data
+            )
             booking = Booking.objects.create(meeting=meeting, **validated_data)
             return booking
