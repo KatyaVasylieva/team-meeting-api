@@ -17,11 +17,19 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = ("name", "description")
 
 
+class ProjectTeamSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Team
+        fields = ("name", "num_of_members")
+
+
 class ProjectRetrieveSerializer(ProjectSerializer):
+    teams = ProjectTeamSerializer(many=True)
 
     class Meta:
         model = Project
-        fields = ("name", "description", "image")
+        fields = ("name", "description", "image", "teams")
 
 
 class ProjectImageSerializer(ProjectSerializer):
