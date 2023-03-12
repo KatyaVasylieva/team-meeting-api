@@ -116,8 +116,7 @@ class MeetingCreateSerializer(MeetingSerializer):
 
 
 class MeetingRetrieveSerializer(MeetingSerializer):
-    team_name = serializers.CharField(source="team.name")
-    team_size = serializers.IntegerField(source="team.num_of_members")
+    team = serializers.CharField(source="team.name")
     project = ProjectSerializer(source="team.project")
     type_of_meeting = serializers.CharField()
 
@@ -125,10 +124,9 @@ class MeetingRetrieveSerializer(MeetingSerializer):
         model = Meeting
         fields = (
             "id",
-            "team_name",
-            "team_size",
-            "project",
             "type_of_meeting",
+            "team",
+            "project",
             "requires_meeting_room"
         )
 
