@@ -183,7 +183,9 @@ class BookingViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(room__name__icontains=room)
 
         if project:
-            queryset = queryset.filter(meeting__team__project__name__icontains=project)
+            queryset = queryset.filter(
+                meeting__team__project__name__icontains=project
+            )
 
         return queryset
 
