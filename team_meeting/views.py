@@ -1,4 +1,4 @@
-from rest_framework import mixins, status
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -8,7 +8,7 @@ from team_meeting.models import (
     MeetingRoom,
     Project,
     TypeOfMeeting,
-    Team
+    Team, Meeting
 )
 from team_meeting.serializers import (
     MeetingRoomSerializer,
@@ -16,7 +16,8 @@ from team_meeting.serializers import (
     ProjectRetrieveSerializer,
     ProjectImageSerializer,
     TypeOfMeetingSerializer,
-    TeamSerializer, TeamListSerializer, TeamRetrieveSerializer
+    TeamSerializer, TeamListSerializer, TeamRetrieveSerializer, MeetingSerializer, MeetingListSerializer,
+    MeetingCreateSerializer
 )
 
 
@@ -98,3 +99,17 @@ class TeamViewSet(
             return TeamRetrieveSerializer
 
         return TeamSerializer
+
+
+class MeetingViewSet(viewsets.ModelViewSet):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return MeetingListSerializer
+
+        if self.action == "create":
+            return MeetingCreateSerializer
+
+        return MeetingListSerializer

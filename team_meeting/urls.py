@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from team_meeting.views import (
     MeetingRoomViewSet,
-    ProjectViewSet, TypeOfMeetingViewSet, TeamViewSet,
+    ProjectViewSet, TypeOfMeetingViewSet, TeamViewSet, MeetingViewSet,
 )
 
 router = routers.DefaultRouter()
@@ -11,6 +11,7 @@ router.register("meeting_rooms", MeetingRoomViewSet)
 router.register("projects", ProjectViewSet)
 router.register("types_of_meeting", TypeOfMeetingViewSet)
 router.register("teams", TeamViewSet)
+router.register("meetings", MeetingViewSet)
 
 urlpatterns = [path("", include(router.urls))]
 
