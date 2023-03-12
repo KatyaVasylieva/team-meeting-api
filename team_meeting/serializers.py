@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from team_meeting.models import MeetingRoom, Project, TypeOfMeeting
+from team_meeting.models import MeetingRoom, Project, TypeOfMeeting, Team
 
 
 class MeetingRoomSerializer(serializers.ModelSerializer):
@@ -35,4 +35,11 @@ class TypeOfMeetingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TypeOfMeeting
+        fields = "__all__"
+
+
+class TeamSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Team
         fields = "__all__"
