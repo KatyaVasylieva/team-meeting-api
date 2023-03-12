@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from team_meeting.models import MeetingRoom, Project, TypeOfMeeting, Team, Meeting
+from team_meeting.models import MeetingRoom, Project, TypeOfMeeting, Team, Meeting, Booking
 
 
 class MeetingRoomSerializer(serializers.ModelSerializer):
@@ -110,3 +110,31 @@ class MeetingRetrieveSerializer(MeetingSerializer):
     class Meta:
         model = Meeting
         fields = ("id", "team_name", "team_size", "project", "type_of_meeting", "requires_meeting_room")
+
+
+class BookingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Booking
+        fields = "__all__"
+
+
+class BookingMeetingSerializer(serializers.ModelSerializer):
+    team = serializers.CharField(source="team.name")
+    project = serializers.CharField(source="team.project.name")
+    type_of_meeting = serializers.CharField()
+
+    class Meta:
+        model = Meeting
+        fields = ("team", "project", "type_of_meeting")
+
+
+class BookingListSerializer(BookingSerializer):
+    time = serializers.CharField(source="duration", read_only=True)
+    room = serializers.CharField(source="room.name")
+    user = serializers.CharField(source="user.email")
+    meeting = BookingMeetingSerializer()
+
+    class Meta:
+        model = Booking
+        fields = ("id", "day", "time", "room", "user", "meeting")
