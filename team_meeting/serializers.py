@@ -43,3 +43,13 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = "__all__"
+
+
+class TeamListSerializer(TeamSerializer):
+    project = serializers.CharField(
+        source="project.name", read_only=True
+    )
+
+    class Meta:
+        model = Team
+        fields = "__all__"
