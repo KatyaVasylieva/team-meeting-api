@@ -17,7 +17,7 @@ from team_meeting.serializers import (
     ProjectImageSerializer,
     TypeOfMeetingSerializer,
     TeamSerializer, TeamListSerializer, TeamRetrieveSerializer, MeetingSerializer, MeetingListSerializer,
-    MeetingCreateSerializer
+    MeetingCreateSerializer, MeetingRetrieveSerializer
 )
 
 
@@ -108,6 +108,9 @@ class MeetingViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return MeetingListSerializer
+
+        if self.action == "retrieve":
+            return MeetingRetrieveSerializer
 
         if self.action == "create":
             return MeetingCreateSerializer
