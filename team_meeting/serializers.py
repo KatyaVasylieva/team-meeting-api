@@ -53,3 +53,11 @@ class TeamListSerializer(TeamSerializer):
     class Meta:
         model = Team
         fields = "__all__"
+
+
+class TeamRetrieveSerializer(TeamSerializer):
+    project = ProjectSerializer()
+
+    class Meta:
+        model = Team
+        fields = "__all__"
