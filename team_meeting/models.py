@@ -121,6 +121,10 @@ class Booking(models.Model):
             raise error_to_raise(
                 "Your meeting start time conflicts with another meeting"
             )
+        if start_hour >= end_hour:
+            raise error_to_raise(
+                "Start hour should be smaller than end hour"
+            )
 
     def clean(self):
         Booking.validate_time(

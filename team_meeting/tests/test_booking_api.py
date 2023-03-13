@@ -201,6 +201,22 @@ class AuthenticatedBookingApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_booking_with_start_after_end_hour(self):
+        payload = {
+            "room": 2,
+            "day": "2023-01-02",
+            "start_hour": 15,
+            "end_hour": 12,
+            "user": 1,
+            "meeting": {
+                "team": 1,
+                "type_of_meeting": 1,
+            }
+        }
+        res = self.client.post(BOOKING_URL, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_update_booking_created_by_user(self):
         payload_put = {
             "room": 2,
