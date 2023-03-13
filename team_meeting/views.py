@@ -29,7 +29,7 @@ from team_meeting.serializers import (
     BookingSerializer,
     BookingListSerializer,
     BookingRetrieveSerializer,
-    BookingCreateSerializer
+    BookingCreateSerializer, BookingUpdateSerializer
 )
 
 
@@ -200,6 +200,9 @@ class BookingViewSet(viewsets.ModelViewSet):
 
         if self.action == "create":
             return BookingCreateSerializer
+
+        if self.action == "update":
+            return BookingUpdateSerializer
 
         return BookingSerializer
 
