@@ -12,7 +12,10 @@ from team_meeting.models import (
     TypeOfMeeting,
     Team, Meeting, Booking
 )
-from team_meeting.permissions import IsOwnerOfObject
+from team_meeting.permissions import (
+    IsOwnerOfObject,
+    IsAdminOrIfAuthenticatedReadOnly
+)
 from team_meeting.serializers import (
     MeetingRoomSerializer,
     ProjectSerializer,
@@ -42,7 +45,7 @@ class MeetingRoomViewSet(
 ):
     queryset = MeetingRoom.objects.all()
     serializer_class = MeetingRoomSerializer
-    # permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class ProjectViewSet(
@@ -53,6 +56,7 @@ class ProjectViewSet(
 ):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -103,6 +107,7 @@ class TypeOfMeetingViewSet(
 ):
     queryset = TypeOfMeeting.objects.all()
     serializer_class = TypeOfMeetingSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class TeamViewSet(
@@ -113,6 +118,7 @@ class TeamViewSet(
 ):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
         name = self.request.query_params.get("name")
@@ -140,6 +146,7 @@ class TeamViewSet(
 class MeetingViewSet(viewsets.ModelViewSet):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
+    permission_classes = (IsAuthenticated, IsOwnerOfObject)
 
     def get_queryset(self):
         project = self.request.query_params.get("project")
