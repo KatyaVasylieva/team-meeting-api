@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from team_meeting.models import MeetingRoom, Project, Team, TypeOfMeeting, Meeting, Booking
-from team_meeting.serializers import BookingListSerializer
+from team_meeting.serializers import BookingListSerializer, BookingRetrieveSerializer
 
 BOOKING_URL = reverse("team-meeting:booking-list")
 
@@ -65,6 +65,10 @@ def sample_booking(room, meeting, user, **params):
     defaults.update(params)
 
     return Booking.objects.create(**defaults)
+
+
+def detail_url(booking_id):
+    return reverse("team-meeting:booking-detail", args=[booking_id])
 
 
 class UnauthenticatedBookingApiTests(TestCase):
@@ -148,4 +152,12 @@ class AuthenticatedBookingApiTests(TestCase):
 
         self.assertIn(serializer_u.data, res.data)
         self.assertNotIn(serializer_w.data, res.data)
+
+    def test_retrieve_booking_detail(self):
+        url = detail_url(self.booking_weekly.id)
+        res = self.client.get(url)
+
+        serializer = BookingRetrieveSerializer(self.booking_weekly)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
 
