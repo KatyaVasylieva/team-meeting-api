@@ -2,7 +2,7 @@ from datetime import datetime
 
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -12,6 +12,7 @@ from team_meeting.models import (
     TypeOfMeeting,
     Team, Meeting, Booking
 )
+from team_meeting.permissions import IsOwnerOfObject
 from team_meeting.serializers import (
     MeetingRoomSerializer,
     ProjectSerializer,
@@ -167,13 +168,14 @@ class MeetingViewSet(viewsets.ModelViewSet):
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
+    permission_classes = (IsAuthenticated, IsOwnerOfObject)
 
     def get_queryset(self):
         day = self.request.query_params.get("day")
         room = self.request.query_params.get("room")
         project = self.request.query_params.get("project")
 
-        queryset = self.queryset
+        queryset = self.queryset.all()
 
         if day:
             day = datetime.strptime(day, "%Y-%m-%d").date()
