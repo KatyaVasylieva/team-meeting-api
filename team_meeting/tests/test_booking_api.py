@@ -161,3 +161,42 @@ class AuthenticatedBookingApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
+    def test_create_booking_with_correct_data(self):
+        payload = {
+            "room": 1,
+            "day": "2023-01-03",
+            "start_hour": 10,
+            "end_hour": 12,
+            "user": 1,
+            "meeting": {
+                "team": 1,
+                "type_of_meeting": 1,
+            }
+        }
+        res = self.client.post(BOOKING_URL, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        booking = Booking.objects.last()
+
+        for key in ["start_hour", "end_hour"]:
+            self.assertEqual(payload[key], getattr(booking, key))
+        self.assertEqual(self.room_blue, getattr(booking, "room"))
+        self.assertEqual("2023-01-03", str(getattr(booking, "day")))
+        self.assertEqual(self.user, getattr(booking, "user"))
+        self.assertEqual(Meeting.objects.last(), getattr(booking, "meeting"))
+
+    def test_create_booking_with_already_taken_time(self):
+        payload = {
+            "room": 2,
+            "day": "2023-01-02",
+            "start_hour": 11,
+            "end_hour": 12,
+            "user": 1,
+            "meeting": {
+                "team": 1,
+                "type_of_meeting": 1,
+            }
+        }
+        res = self.client.post(BOOKING_URL, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
