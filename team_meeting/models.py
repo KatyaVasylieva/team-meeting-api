@@ -10,7 +10,7 @@ from team_meeting_service import settings
 
 
 class MeetingRoom(models.Model):
-    name = models.CharField(max_length=63)
+    name = models.CharField(max_length=63, unique=True)
     capacity = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(100)]
     )
@@ -63,16 +63,8 @@ class Team(models.Model):
 
 
 class TypeOfMeeting(models.Model):
-    NAME_CHOICES = (
-        ("DAILY", "Daily meeting"),
-        ("WEEKLY", "Weekly meeting"),
-        ("URGENT", "Urgent meeting"),
-        ("CLIENT", "Meeting with client"),
-        ("CELEBRATION", "Celebration"),
-    )
-
     name = models.CharField(
-        max_length=11, choices=NAME_CHOICES
+        max_length=25, unique=True
     )
 
     def __str__(self):
