@@ -22,14 +22,21 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ("name", "description")
+        fields = "__all__"
 
 
 class ProjectTeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ("name", "num_of_members")
+        fields = ("id", "name", "num_of_members")
+
+
+class ProjectCreateSerializer(ProjectSerializer):
+
+    class Meta:
+        model = Project
+        fields = ("name", "description")
 
 
 class ProjectRetrieveSerializer(ProjectSerializer):
@@ -37,7 +44,7 @@ class ProjectRetrieveSerializer(ProjectSerializer):
 
     class Meta:
         model = Project
-        fields = ("name", "description", "image", "teams")
+        fields = ("id", "name", "description", "image", "teams")
 
 
 class ProjectImageSerializer(ProjectSerializer):
@@ -72,7 +79,7 @@ class TeamListSerializer(TeamSerializer):
 
 
 class TeamRetrieveSerializer(TeamSerializer):
-    project = ProjectSerializer()
+    project = ProjectRetrieveSerializer()
 
     class Meta:
         model = Team
@@ -117,7 +124,7 @@ class MeetingCreateSerializer(MeetingSerializer):
 
 class MeetingRetrieveSerializer(MeetingSerializer):
     team = serializers.CharField(source="team.name")
-    project = ProjectSerializer(source="team.project")
+    project = ProjectRetrieveSerializer(source="team.project")
     type_of_meeting = serializers.CharField()
 
     class Meta:

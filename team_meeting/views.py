@@ -18,6 +18,7 @@ from team_meeting.serializers import (
     ProjectSerializer,
     ProjectRetrieveSerializer,
     ProjectImageSerializer,
+    ProjectCreateSerializer,
     TypeOfMeetingSerializer,
     TeamSerializer,
     TeamListSerializer,
@@ -29,7 +30,8 @@ from team_meeting.serializers import (
     BookingSerializer,
     BookingListSerializer,
     BookingRetrieveSerializer,
-    BookingCreateSerializer, BookingUpdateSerializer
+    BookingCreateSerializer,
+    BookingUpdateSerializer,
 )
 
 
@@ -60,7 +62,7 @@ class ProjectViewSet(
             return ProjectRetrieveSerializer
 
         if self.action == "create":
-            return ProjectSerializer
+            return ProjectCreateSerializer
 
         if self.action == "upload_image":
             return ProjectImageSerializer
