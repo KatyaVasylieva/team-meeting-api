@@ -241,3 +241,28 @@ class AuthenticatedBookingApiTests(TestCase):
 
         res = self.client.patch(url, payload_patch)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_booking_created_by_user(self):
+        meeting = self.booking_weekly.meeting
+        id_to_delete = self.booking_weekly.id
+
+        url = detail_url(id_to_delete)
+        res = self.client.delete(url)
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertNotIn(id_to_delete, Booking.objects.values_list("id"))
+        self.assertNotIn(meeting, Meeting.objects.all())
+
+    def test_delete_booking_created_by_another_user(self):
+        another_user = get_user_model().objects.create_user(
+            email="anothe@user.com",
+            password="testpassword"
+        )
+
+        client_type = TypeOfMeeting.objects.create(name="Client")
+        meeting_client = sample_meeting(self.team_library_back, client_type)
+        booking_client = sample_booking(self.room_blue, meeting_client, another_user, start_hour=16, end_hour=17)
+
+        url = detail_url(booking_client.id)
+
+        res = self.client.delete(url)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
