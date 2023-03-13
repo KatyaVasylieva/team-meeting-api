@@ -200,3 +200,44 @@ class AuthenticatedBookingApiTests(TestCase):
         res = self.client.post(BOOKING_URL, payload, format="json")
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_booking_created_by_user(self):
+        payload_put = {
+            "room": 2,
+            "day": "2023-01-04",
+            "start_hour": 18,
+            "end_hour": 19,
+        }
+        payload_patch = {
+            "day": "2023-01-05",
+        }
+
+        url = detail_url(self.booking_weekly.id)
+
+        res = self.client.put(url, payload_put)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        for key in ["room", "day", "start_hour", "end_hour"]:
+            self.assertEqual(payload_put[key], res.data[key])
+
+        res = self.client.patch(url, payload_patch)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(payload_patch["day"], res.data["day"])
+
+    def test_update_booking_created_by_another_user(self):
+        another_user = get_user_model().objects.create_user(
+            email="anothe@user.com",
+            password="testpassword"
+        )
+
+        client_type = TypeOfMeeting.objects.create(name="Client")
+        meeting_client = sample_meeting(self.team_library_back, client_type)
+        booking_client = sample_booking(self.room_blue, meeting_client, another_user, start_hour=16, end_hour=17)
+
+        payload_patch = {
+            "day": "2023-01-10",
+        }
+
+        url = detail_url(booking_client.id)
+
+        res = self.client.patch(url, payload_patch)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)

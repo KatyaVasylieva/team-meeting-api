@@ -179,3 +179,22 @@ class BookingCreateSerializer(BookingSerializer):
             )
             booking = Booking.objects.create(meeting=meeting, **validated_data)
             return booking
+
+
+class BookingUpdateSerializer(BookingSerializer):
+
+    class Meta:
+        model = Booking
+        fields = ("room", "day", "start_hour", "end_hour")
+
+    def update(self, instance, validated_data):
+
+        instance.room = validated_data.get("room", instance.room)
+        instance.day = validated_data.get("day", instance.day)
+        instance.start_hour = validated_data.get(
+            "start_hour", instance.start_hour
+        )
+        instance.end_hour = validated_data.get("end_hour", instance.end_hour)
+        instance.save()
+
+        return instance
