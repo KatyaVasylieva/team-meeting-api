@@ -93,13 +93,13 @@ class MeetingSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class MeetingListSerializer(MeetingSerializer):
+class MeetingListSerializer(serializers.ModelSerializer):
     team = serializers.SlugRelatedField(
         slug_field="name",
         read_only=True
     )
     project = serializers.CharField(
-        source="team.project",
+        source="team.project.name",
         read_only=True
     )
     type_of_meeting = serializers.CharField()
@@ -115,14 +115,14 @@ class MeetingListSerializer(MeetingSerializer):
         )
 
 
-class MeetingCreateSerializer(MeetingSerializer):
+class MeetingCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
         fields = ("team", "type_of_meeting")
 
 
-class MeetingRetrieveSerializer(MeetingSerializer):
+class MeetingRetrieveSerializer(serializers.ModelSerializer):
     team = serializers.CharField(source="team.name")
     project = ProjectRetrieveSerializer(source="team.project")
     type_of_meeting = serializers.CharField()

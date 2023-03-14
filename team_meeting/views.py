@@ -86,7 +86,7 @@ class ProjectViewSet(
         methods=["POST"],
         detail=True,
         url_path="upload-image",
-        permission_classes=[IsAdminUser],
+        # permission_classes=[IsAdminUser],
     )
     def upload_image(self, request, pk=None):
         """Endpoint for uploading image to specific project"""
@@ -116,7 +116,7 @@ class TeamViewSet(
     mixins.CreateModelMixin,
     GenericViewSet,
 ):
-    queryset = Team.objects.all()
+    queryset = Team.objects.select_related("project")
     serializer_class = TeamSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
@@ -144,8 +144,9 @@ class TeamViewSet(
 
 
 class MeetingViewSet(viewsets.ModelViewSet):
-    queryset = Meeting.objects.all()
-    serializer_class = MeetingSerializer
+    queryset = Meeting.objects.select_related(
+        "type_of_meeting", "team__project"
+    )
     permission_classes = (IsAuthenticated, IsOwnerOfObject)
 
     def get_queryset(self):
@@ -168,14 +169,20 @@ class MeetingViewSet(viewsets.ModelViewSet):
         if self.action == "create":
             return MeetingCreateSerializer
 
-        return MeetingListSerializer
+        return MeetingSerializer
 
     def perform_create(self, serializer):
         serializer.save(requires_meeting_room="False")
 
 
 class BookingViewSet(viewsets.ModelViewSet):
-    queryset = Booking.objects.all()
+    queryset = Booking.objects.select_related(
+        "room",
+        "user",
+        "meeting__team",
+        "meeting__type_of_meeting",
+        "meeting__team__project"
+    )
     serializer_class = BookingSerializer
     permission_classes = (IsAuthenticated, IsOwnerOfObject)
 
