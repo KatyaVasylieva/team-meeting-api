@@ -1,8 +1,10 @@
 from datetime import datetime
 
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -82,6 +84,18 @@ class ProjectViewSet(
 
         return queryset
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "name",
+                type=OpenApiTypes.STR,
+                description="Filter by project name (ex. ?name=lib)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
     @action(
         methods=["POST"],
         detail=True,
@@ -133,6 +147,23 @@ class TeamViewSet(
 
         return queryset
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "name",
+                type=OpenApiTypes.STR,
+                description="Filter by team name (ex. ?name=back)",
+            ),
+            OpenApiParameter(
+                "project",
+                type=OpenApiTypes.STR,
+                description="Filter by project name (ex. ?project=lib)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
     def get_serializer_class(self):
         if self.action == "list":
             return TeamListSerializer
@@ -147,17 +178,29 @@ class MeetingViewSet(viewsets.ModelViewSet):
     queryset = Meeting.objects.select_related(
         "type_of_meeting", "team__project"
     )
-    permission_classes = (IsAuthenticated, IsOwnerOfObject)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         project = self.request.query_params.get("project")
 
-        queryset = self.queryset
+        queryset = self.queryset.all()
 
         if project:
             queryset = queryset.filter(team__project__name__icontains=project)
 
         return queryset
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "project",
+                type=OpenApiTypes.STR,
+                description="Filter by project name (ex. ?project=lib)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -206,6 +249,28 @@ class BookingViewSet(viewsets.ModelViewSet):
             )
 
         return queryset
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "day",
+                type=OpenApiTypes.DATE,
+                description="Filter by booking day (ex. ?2023-01-23)",
+            ),
+            OpenApiParameter(
+                "room",
+                type=OpenApiTypes.STR,
+                description="Filter by meeting room name day (ex. ?blue)",
+            ),
+            OpenApiParameter(
+                "project",
+                type=OpenApiTypes.STR,
+                description="Filter by project name (ex. ?project=lib)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_serializer_class(self):
         if self.action == "list":
