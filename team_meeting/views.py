@@ -4,6 +4,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -174,11 +175,17 @@ class TeamViewSet(
         return TeamSerializer
 
 
+class MeetingBookingPagination(PageNumberPagination):
+    page_size = 10
+    max_page_size = 100
+
+
 class MeetingViewSet(viewsets.ModelViewSet):
     queryset = Meeting.objects.select_related(
         "type_of_meeting", "team__project"
     )
     permission_classes = (IsAuthenticated,)
+    pagination_class = MeetingBookingPagination
 
     def get_queryset(self):
         project = self.request.query_params.get("project")
@@ -228,6 +235,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     )
     serializer_class = BookingSerializer
     permission_classes = (IsAuthenticated, IsOwnerOfObject)
+    pagination_class = MeetingBookingPagination
 
     def get_queryset(self):
         day = self.request.query_params.get("day")
