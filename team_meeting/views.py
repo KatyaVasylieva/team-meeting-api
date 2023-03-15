@@ -5,7 +5,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -78,7 +78,7 @@ class ProjectViewSet(
 
     def get_queryset(self):
         name = self.request.query_params.get("name")
-        queryset = self.queryset
+        queryset = self.queryset.all()
 
         if name:
             queryset = queryset.filter(name__icontains=name)
@@ -101,7 +101,7 @@ class ProjectViewSet(
         methods=["POST"],
         detail=True,
         url_path="upload-image",
-        # permission_classes=[IsAdminUser],
+        permission_classes=[IsAdminUser],
     )
     def upload_image(self, request, pk=None):
         """Endpoint for uploading image to specific project"""
@@ -138,7 +138,7 @@ class TeamViewSet(
     def get_queryset(self):
         name = self.request.query_params.get("name")
         project = self.request.query_params.get("project")
-        queryset = self.queryset
+        queryset = self.queryset.all()
 
         if name:
             queryset = queryset.filter(name__icontains=name)
